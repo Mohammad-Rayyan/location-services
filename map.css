@@ -1,0 +1,22 @@
+ html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+        z-index: 10;
+      }
+.header-container {
+    border-bottom-right-radius: 2px;
+    position: absolute;
+    background-color: white;
+    width: 400px;
+    z-index: 30;
+}
+.thumb {
+    border: 1px solid #000;
+    margin: 10px 5px 0 0;
+  }
+#pointer_div{
+}

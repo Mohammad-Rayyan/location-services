@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="map.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkoWsm1VEBgsEnPcxjlcYS3sU4G3mEmZc"></script>
+    <script src="js/fabric.min.js"></script>
+    <script src="js/map.js"></script>
+  </head>
+  	<body>
+  	<header class="header-container">
+  	<h1>Get person face recognition data</h1>
+	  	<input type="file" id="files" name="files[]"/>
+		<canvas id="pointer_div" width="400" height="500"></canvas>
+		<button onclick="detect()">detect</button>
+	</header>
+    <div id="map"></div>
+  </body>
+</html>
