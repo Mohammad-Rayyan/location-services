@@ -59,6 +59,7 @@ function handleFileSelect(evt) {
 function canvasFill(img,canvas){
   var imgInstance = new fabric.Image(img);
             canvas.setBackgroundImage(imgInstance);
+            canvas.backgroundImageStretch = false;
             var rect1= new fabric.Rect({
                           width: 350, height: 450,
                           left: 10, top: 10,opacity:0.3,hasRotatingPoint:false,
@@ -145,7 +146,29 @@ function detect(){
   v5 = NoseMouth / Height;
   v6 = MouthHeight / Height;
   console.log(v1,v2,v3,v4,v5,v6);
-  console.log(y._objects);
+  var vector = [v1,v2,v3,v4,v5,v6];
+  var index=find(vector);
+  console.log(data[index].name);
+  
 }
-
+function find(vec){
+  var minIndex = -1;
+  var min = 100;
+  var current =0;
+  for (var i = 0; i < data.length; i++) {
+    current =0;
+    for (var j = 0; j < 6; j++) {
+      current =current + Math.pow(data[i].detectionVector[j] - vec[j],2);
+    }
+    current = Math.sqrt(current);
+    console.log("current " + current);
+    if(current < min){
+      min =current;
+      minIndex = i;
+    }
+    console.log("min " + min);
+    console.log("minIndex " + minIndex);
+  }
+  return minIndex;
+}
 google.maps.event.addDomListener(window, 'load', initialize);
