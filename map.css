@@ -11,12 +11,35 @@
     border-bottom-right-radius: 2px;
     position: absolute;
     background-color: white;
-    width: 400px;
     z-index: 30;
+}
+#faceDetect{
+  width: 400px;
+}
+#locationHistory{
+  width: 100%;
 }
 .thumb {
     border: 1px solid #000;
     margin: 10px 5px 0 0;
   }
 #pointer_div{
+}
+#list {
+    position: fixed;
+    right: 0px;
+    top: 40px;
+    overflow-y: scroll;
+    height: calc(100% - 50px);
+    background-color: white;
+    padding: 5px;
+}
+#tools{
+    display: block;
+    position: fixed;
+    background-color: white;
+    width: 100%;
+    height: 40px;
+    text-align: left;
+    font-weight: normal;
 }

@@ -1,5 +1,6 @@
 
 var m = new fabric.Canvas('pointer_div');
+var map;
 
 function initialize(){
 
@@ -12,13 +13,11 @@ function initialize(){
     mapTypeId:google.maps.MapTypeId.ROADMAP
     };
 
-  var map=new google.maps.Map(document.getElementById("map"),mapProp);
+  map=new google.maps.Map(document.getElementById("map"),mapProp);
 
   var marker=new google.maps.Marker({
     position:myCenter,
     });
-
-  marker.setMap(map);
   // Zoom to 9 when clicking on marker
   google.maps.event.addListener(marker,'click',function() {
     map.setZoom(15);
@@ -119,7 +118,16 @@ function makeLine(coords) {
     selectable: false
   });
 }
+///////////////////////////////////////// location history
+var SCALAR_E7 = 0.0000001;
 
+function pad(num, size) {
+  var s = num+"";
+  while (s.length < size) s = "0" + s;
+  return s;
+}
+var locations = Array();
+var fileName="";
 function detect(){
   var y = document.getElementById("pointer_div").fabric;
   //Width
@@ -149,8 +157,15 @@ function detect(){
   var vector = [v1,v2,v3,v4,v5,v6];
   var index=find(vector);
   console.log(data[index].name);
-  
-}
+  fileName = data[index].file;
+  console.log(fileName);
+  loadJSON(function(response) {
+  // Parse JSON string into object
+    locations=locations.concat(JSON.parse(response).locations);
+ });
+  init();
+};
+
 function find(vec){
   var minIndex = -1;
   var min = 100;
@@ -170,5 +185,170 @@ function find(vec){
     console.log("minIndex " + minIndex);
   }
   return minIndex;
+}
+
+ function loadJSON(callback) {   
+
+    var xobj = new XMLHttpRequest();
+        xobj.overrideMimeType("application/json");
+    xobj.open('GET', 'data/'+fileName+'.json', false); // Replace 'my_data' with the path to your file
+    xobj.onreadystatechange = function () {
+          if (xobj.readyState == 4 && xobj.status == "200") {
+            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+            callback(xobj.responseText);
+          }
+    };
+    xobj.send(null);  
+ };
+
+    //init user interface 
+function init(){
+
+      //Sort be Time:
+      locations.sort(function (a,b) {
+        if (a.timestampMs < b.timestampMs)
+        return -1;
+        if (a.timestampMs > b.timestampMs)
+        return 1;
+        return 0;
+      });
+      
+      //generate list:
+      var year=-1;
+      var month=-1;
+      var day=-1;
+      var stime=-1;
+      var count=0;
+      for(var i=0;i<locations.length;i++){
+        var date = new Date(1*locations[i].timestampMs);
+        count++;
+        if( year!=date.getFullYear() || 
+          month!=date.getMonth() ||
+          day!=date.getDate()
+          ){
+          if(stime!=-1){
+            var etime=locations[i].timestampMs;
+            var element="";
+            element+="<div class='listelement' stime='"+stime+"' etime='"+etime+"'>";
+            element+="<a onclick='display("+stime+","+etime+");return false;' href='#'>"
+            element+=pad(day,2)+".";
+            element+=pad(month+1,2)+" ";
+            element+=year+" ";
+            element+=" ("+count+")";
+            element+="</a>"
+            element+="</div>";
+            $("#list").append(element);
+          }
+          year=date.getFullYear(); 
+          month=date.getMonth();
+          day=date.getDate();
+          count=0;
+          stime=locations[i].timestampMs;
+        }
+      }
+      
+      console.log(""+locations.length+" Location laoded");
+      $("#faceDetect").css("display","none");
+      $("#locationHistory").css("display","block");
+      
+      setTimeout(function(){ google.maps.event.trigger(map, "resize"); }, 1000);
+}
+
+//Load data
+var gmarkers = [];
+
+function removeMarkers(){
+  for(i=0; i<gmarkers.length; i++){
+    gmarkers[i].setMap(null);
+  }
+};
+
+var current = null;
+function display(start,end){
+  var cordinats =Array();
+  //Load Path
+  var sindex=-1;
+  var eindex;
+  removeMarkers();
+  for(var i=0;i<locations.length;i++){
+    if(locations[i].timestampMs>=start && locations[i].timestampMs<end){
+      if(sindex==-1)
+        sindex=i;
+      eindex=i; 
+      cordinats.push({lat: locations[i].latitudeE7*SCALAR_E7, lng: locations[i].longitudeE7*SCALAR_E7});
+
+    }
+  }
+var bounds = new google.maps.LatLngBounds();
+  for(var j=0;j<cordinats.length;j++){
+    var marker = new google.maps.Marker({
+    position: new google.maps.LatLng(cordinats[j].lat, cordinats[j].lng),
+    map:map
+    });
+
+    // Push your newly created marker into the array:
+    gmarkers.push(marker);
+    bounds.extend(marker.getPosition());
+  };
+  //Center map:
+  if($('#cb').is(':checked'))
+    map.fitBounds(bounds);
+  
+  //Create slider:
+  if(current != null){
+    current.setMap(null);
+  };
+  $("#slider").slider({
+      min: sindex,
+      max: eindex,
+      range: "min",
+      value: sindex,
+      slide: function( event, ui ) {
+        if(current != null){
+          current.setMap(null);
+        };
+        initialLocation = new google.maps.LatLng(locations[ui.value].latitudeE7*SCALAR_E7, locations[ui.value].longitudeE7*SCALAR_E7);
+        map.setCenter(initialLocation);
+        //Display information
+        var info="";
+        var date = new Date(1*locations[ui.value].timestampMs);
+        info+=date.toLocaleString();
+        info+=" Accuracy: "+locations[ui.value].accuracy+"m";
+        $("#info").text(info);
+        current = new google.maps.Marker({
+          position: map.getCenter(),
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 10
+          },
+          draggable: false,
+          map: map
+        });
+      }
+    });
+};
+function search(){
+  //Rmove last search color
+  $(".listelement").each(function (){
+    $(this).css("background-color","white");
+  });
+  //Search for locations
+  var timestamps=Array();
+  for(var i=0;i<locations.length;i++){
+    if(map.getBounds().contains( new google.maps.LatLng(parseFloat(locations[i].latitudeE7*SCALAR_E7),parseFloat(locations[i].longitudeE7*SCALAR_E7)))){
+      timestamps.push(locations[i].timestampMs);
+    }
+  }
+  //Display Dates
+  $(".listelement").each(function (){
+    var s=$(this).attr("stime");
+    var e=$(this).attr("etime");
+    for(var i=0;i<timestamps.length;i++){
+      if(timestamps[i]>=s && timestamps[i]<e){
+        $(this).css("background-color","orange");
+        break;
+      }
+    }
+  });   
 }
 google.maps.event.addDomListener(window, 'load', initialize);
