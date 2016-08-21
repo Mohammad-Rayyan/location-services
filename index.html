@@ -8,14 +8,35 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkoWsm1VEBgsEnPcxjlcYS3sU4G3mEmZc"></script>
     <script src="js/fabric.min.js"></script>
     <script src="data/data.json"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
     <script src="js/map.js"></script>
   </head>
   	<body>
   	<header class="header-container">
-  	<h1>Get person face recognition data</h1>
-	  	<input type="file" id="files" name="files[]"/>
-		<canvas id="pointer_div" width="400" height="500"></canvas>
-		<button onclick="detect()">detect</button>
+    <div id="faceDetect">
+      <h1>Get person face recognition data</h1>
+      <input type="file" id="files" name="files[]"/>
+      <canvas id="pointer_div" width="400" height="500"></canvas>
+      <button onclick="detect()">detect</button>
+    </div>
+  	<div id="locationHistory" style="display:none">
+      <div id="tools">
+        <div id="search" style="display:inline">
+        <button type="button" id="berechnen" onclick="search(); return false;">Search in Selected Mapview</button>
+         Autocenter <input id="cb" type="checkbox" checked/>
+        </div>
+        <div id="info" style="display:inline">
+          
+        </div>
+        <div id="scroll" >
+          <div id='slider' style="width: 100%;"> </div>
+        </div>
+      </div>
+      <div id="list">
+      </div>
+    </div>
 	</header>
     <div id="map"></div>
   </body>
