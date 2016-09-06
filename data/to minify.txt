@@ -1,0 +1,8 @@
+Installation
+npm install -g json-minify
+
+
+Usage
+Specify a file:
+
+json-minify data.json > data.min.json

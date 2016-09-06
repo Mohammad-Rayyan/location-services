@@ -1,7 +1,7 @@
 	data=[
 		{
 			"name":"obama",
-			"file":"obama",
+			"file":"obama.min",
 			"detectionVector":[
 			0.3538599111720539,
 			0.13946874421261882,
@@ -13,7 +13,7 @@
 		},
 		{
 			"name":"putin",
-			"file":"putin",
+			"file":"putin.min",
 			"detectionVector":[
 			0.32887462772498227,
 			0.12154614157953339,
@@ -25,7 +25,7 @@
 		},
 		{
 			"name":"smith",
-			"file":"smith",
+			"file":"smith.min",
 			"detectionVector":[
 			0.41669173257937336,
 			0.18017769007288334,
