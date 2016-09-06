@@ -1,11 +1,18 @@
 
 var m = new fabric.Canvas('pointer_div');
+var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+var canvas_max_width = w;
+var canvas_max_height = h;
 var map;
 
 function initialize(){
-
+  var c = new fabric.Canvas("pointer_div");
+  document.getElementById("pointer_div").fabric = c;
+  document.getElementById('files').addEventListener('change', handleFileSelect, false);
+}
+function mapinit(){
   var myCenter=new google.maps.LatLng(32.760995,35.018563);
-
   var mapProp = {
     center:myCenter,
     zoom:9,
@@ -23,8 +30,6 @@ function initialize(){
     map.setZoom(15);
     map.setCenter(marker.getPosition());
     });
-
-  document.getElementById('files').addEventListener('change', handleFileSelect, false);
 }
 
 function handleFileSelect(evt) {
@@ -44,9 +49,9 @@ function handleFileSelect(evt) {
           // var ctx = c.getContext("2d");
          image.src = e.target.result;
 	      image.title = theFile.name;
-        var c = new fabric.Canvas("pointer_div");
-        document.getElementById("pointer_div").fabric = c;
-        canvasFill(image,c);
+        var y = document.getElementById("pointer_div").fabric;
+        y.clear();
+        canvasFill(image,y);
       };
 
       })(f);
@@ -56,24 +61,43 @@ function handleFileSelect(evt) {
   }
 
 function canvasFill(img,canvas){
+  console.log("width" +img.width)
+  console.log("height" +img.height)
+  var ratio = 1;
+  if(img.width > canvas_max_width){
+    ratio = canvas_max_width / img.width; 
+    img.width = canvas_max_width;
+  }
+  img.height = ratio * img.height;
+  console.log("width" +img.width)
+  console.log("height" +img.height)
+  ratio=1;
+  if(img.height > canvas_max_height){
+    ratio = canvas_max_height / img.height; 
+    img.height = canvas_max_height;
+  }
+  img.width = ratio * img.width;
+  console.log("width" +img.width)
+  console.log("height" +img.height)
   var imgInstance = new fabric.Image(img);
-            canvas.setBackgroundImage(imgInstance);
-            canvas.backgroundImageStretch = false;
-            var rect1= new fabric.Rect({
-                          width: 350, height: 450,
-                          left: 10, top: 10,opacity:0.3,hasRotatingPoint:false,
-                        })
-            var rect2= new fabric.Rect({
-                          width: 100, height: 50,
-                          left: 150, top: 290,opacity:0.4,fill: '#aac',hasRotatingPoint:false,
-                        })
-            canvas.add(rect1);
-            canvas.add(rect2);
-            rect1.bringToFront();
-            rect2.bringToFront();
-      var line = makeLine([ 150, 150, 250, 150 ]),
-      line2 = makeLine([  175, 250, 225, 250 ]),
-      line3 = makeLine([  150, 300, 250, 300 ]);
+  canvas.setBackgroundImage(imgInstance);
+  canvas.setHeight(imgInstance.height);
+  canvas.setWidth(imgInstance.width);
+  var rect1= new fabric.Rect({
+                width: 350, height: 450,
+                left: 10, top: 10,opacity:0.3,hasRotatingPoint:false,
+              })
+  var rect2= new fabric.Rect({
+                width: 100, height: 50,
+                left: 150, top: 290,opacity:0.4,fill: '#aac',hasRotatingPoint:false,
+              })
+  canvas.add(rect1);
+  canvas.add(rect2);
+  rect1.bringToFront();
+  rect2.bringToFront();
+  var line = makeLine([ 150, 150, 250, 150 ]),
+  line2 = makeLine([  175, 250, 225, 250 ]),
+  line3 = makeLine([  150, 300, 250, 300 ]);
 
   canvas.add(line, line2, line3);
 
@@ -230,13 +254,13 @@ function init(){
             var etime=locations[i].timestampMs;
             var element="";
             element+="<div class='listelement' stime='"+stime+"' etime='"+etime+"'>";
-            element+="<a onclick='display("+stime+","+etime+");return false;' href='#'>"
+            element+="<li  role='presentation'><a onclick='display("+stime+","+etime+");return false;' href='#'>"
             element+=pad(day,2)+".";
             element+=pad(month+1,2)+" ";
             element+=year+" ";
-            element+=" ("+count+")";
-            element+="</a>"
-            element+="</div>";
+            element+="<span class='badge'>"+count+"</span>";
+            element+="</a></li>"
+            element+="</div><li role='separator' class='divider'></li>";
             $("#list").append(element);
           }
           year=date.getFullYear(); 
@@ -250,7 +274,8 @@ function init(){
       console.log(""+locations.length+" Location laoded");
       $("#faceDetect").css("display","none");
       $("#locationHistory").css("display","block");
-      
+      $("#map").css("display","block");
+      mapinit();
       setTimeout(function(){ google.maps.event.trigger(map, "resize"); }, 1000);
 }
 
@@ -276,7 +301,6 @@ function display(start,end){
         sindex=i;
       eindex=i; 
       cordinats.push({lat: locations[i].latitudeE7*SCALAR_E7, lng: locations[i].longitudeE7*SCALAR_E7});
-
     }
   }
 var bounds = new google.maps.LatLngBounds();

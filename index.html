@@ -5,39 +5,109 @@
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
     <link rel="stylesheet" href="map.css">
+    <!-- <script   src="https://code.jquery.com/jquery-3.1.0.min.js"   integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="   crossorigin="anonymous"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkoWsm1VEBgsEnPcxjlcYS3sU4G3mEmZc"></script>
     <script src="js/fabric.min.js"></script>
     <script src="data/data.json"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
     <script src="js/map.js"></script>
   </head>
-  	<body>
-  	<header class="header-container">
-    <div id="faceDetect">
-      <h1>Get person face recognition data</h1>
-      <input type="file" id="files" name="files[]"/>
-      <canvas id="pointer_div" width="400" height="500"></canvas>
-      <button onclick="detect()">detect</button>
-    </div>
-  	<div id="locationHistory" style="display:none">
-      <div id="tools">
-        <div id="search" style="display:inline">
-        <button type="button" id="berechnen" onclick="search(); return false;">Search in Selected Mapview</button>
-         Autocenter <input id="cb" type="checkbox" checked/>
+  	<body class="text-center">
+    <div class="container header-container">
+            <div id="faceDetect">
+                <h1 id="fd-title" class="text-uppercase">face recognition</h1>
+                <div class="text-right">
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">
+                    <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                     Help
+                    </button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                      <div class="modal-dialog text-left" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Demo</h4>
+                          </div>
+                          <div class="modal-body">
+                            1 - Browse Image with size bigger than 400x500.
+                            <hr>
+                            2 - Match the the point and rectangles as the picture below:
+                            <hr>
+                            <img id ="demo-pic" src="demo-pic.jpg" alt="">
+                            <hr>
+                            3 - Press detect.
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <label class="btn btn-block btn-primary">
+                    <span class="glyphicon glyphicon-open" aria-hidden="true"></span>
+                     Browse an image(min 400x500) &hellip; <input type="file" id="files" name="files[]" style="display: none;">
+                </label>
+                <div id="play-ground" class=" center-block">
+                    <canvas class="center-block" id="pointer_div"></canvas>
+                </div>
+                
+                <label class="btn btn-block btn-primary" onclick="detect()">
+                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                     Detect
+                </label>
+            </div>
         </div>
-        <div id="info" style="display:inline">
-          
+    <nav id="locationHistory" style="display:none" class="navbar navbar-default">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Brand</a>
+          <div id="search" style="display:inline">
+            <button type="button" class="btn btn-default" id="berechnen" onclick="search(); return false;">Search in Selected Mapview</button>
+             Autocenter <input id="cb" type="checkbox" checked/>
+          </div>
+          <div id="scroll" class="container-fluid">
+            <div id='slider' style="width: 100%;"> </div>
+          </div>
         </div>
-        <div id="scroll" >
-          <div id='slider' style="width: 100%;"> </div>
-        </div>
-      </div>
-      <div id="list">
-      </div>
-    </div>
-	</header>
-    <div id="map"></div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Date <span class="caret"></span></a>
+              <div id="info" style="display:inline"></div>
+              <ul id="list" class="dropdown-menu .pull-right">
+                <li role="separator" class="divider"></li>
+              </ul>
+            </li>
+          </ul>
+           
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+    <div id="map" style="display: none;"></div>
   </body>
 </html>

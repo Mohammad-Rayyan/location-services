@@ -2,44 +2,57 @@
         height: 100%;
         margin: 0;
         padding: 0;
-      }
-      #map {
-        height: 100%;
-        z-index: 10;
-      }
-.header-container {
-    border-bottom-right-radius: 2px;
-    position: absolute;
-    background-color: white;
-    z-index: 30;
 }
-#faceDetect{
-  width: 400px;
+#map {
+	height: calc(100% - 78px);
+	width: 100%;
+	top: 0px;
+	z-index: 10;
 }
-#locationHistory{
-  width: 100%;
+#play-ground{
+	background-color: #2e6ca3;
+}
+.canvas-container {
+	margin:0 auto;
+}
+#fd-title{
+	margin: 3rem 0;
+}
+/* unset bs3 setting */
+.modal-open {
+ overflow: auto; 
+}
+#demo-pic{
+	width: 100%;
 }
 .thumb {
     border: 1px solid #000;
     margin: 10px 5px 0 0;
   }
-#pointer_div{
+.listelement{
+	text-align: center;
 }
 #list {
     position: fixed;
     right: 0px;
-    top: 40px;
+    top: 51px;
     overflow-y: scroll;
     height: calc(100% - 50px);
     background-color: white;
     padding: 5px;
 }
-#tools{
-    display: block;
-    position: fixed;
-    background-color: white;
-    width: 100%;
-    height: 40px;
-    text-align: left;
-    font-weight: normal;
+nav#locationHistory {
+    margin-bottom: 0px;
+}
+div#search {
+    top: 9px;
+    position: relative;
+    padding: 9px 10px;
+}
+#locationHistory,#scroll{
+	z-index: 100;
+}
+#scroll{
+	margin-bottom: 10px;
+    margin-top: 20px;
 }
