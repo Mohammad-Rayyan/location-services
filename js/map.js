@@ -194,10 +194,11 @@ function find(vec){
   var minIndex = -1;
   var min = 100;
   var current =0;
+  var constants= [4,1.8,1.9,10.1,6,1.6];
   for (var i = 0; i < data.length; i++) {
     current =0;
     for (var j = 0; j < 6; j++) {
-      current =current + Math.pow(data[i].detectionVector[j] - vec[j],2);
+      current =current +constants[j]*(Math.pow(data[i].detectionVector[j] - vec[j],2));
     }
     current = Math.sqrt(current);
     console.log("current " + current);
