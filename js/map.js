@@ -19,9 +19,7 @@ function mapinit(){
     mapTypeControlOptions: false,
     mapTypeId:google.maps.MapTypeId.ROADMAP
     };
-
   map=new google.maps.Map(document.getElementById("map"),mapProp);
-
   var marker=new google.maps.Marker({
     position:myCenter,
     });
@@ -33,52 +31,42 @@ function mapinit(){
 }
 
 function handleFileSelect(evt) {
-    var f = evt.target.files[0]; // FileList object
-      // Only process image files.
-      if (!f.type.match('image.*')) {
-        return;
-      }
-      var reader = new FileReader();
+	var f = evt.target.files[0];
+  	// Only process image files.
+  	if (!f.type.match('image.*')) {
+    	return;
+  	}
+  	var reader = new FileReader();
+  	// Closure to capture the file information.
+  	reader.onload = (function(theFile) {
+    	return function(e) {
+		    var image = document.createElement("img");
+		    // var ctx = c.getContext("2d");
+		    image.src = e.target.result;
+		    image.title = theFile.name;
+		    var y = document.getElementById("pointer_div").fabric;
+		    y.clear();
+		    canvasFill(image,y);
+  		};
+  })(f);
 
-      // Closure to capture the file information.
-      reader.onload = (function(theFile) {
-        return function(e) {
-          
-
-          var image = document.createElement("img");
-          // var ctx = c.getContext("2d");
-         image.src = e.target.result;
-	      image.title = theFile.name;
-        var y = document.getElementById("pointer_div").fabric;
-        y.clear();
-        canvasFill(image,y);
-      };
-
-      })(f);
-
-      // Read in the image file as a data URL.
-      reader.readAsDataURL(f);    
-  }
+  // Read in the image file as a data URL.
+  reader.readAsDataURL(f);    
+}
 
 function canvasFill(img,canvas){
-  console.log("width" +img.width)
-  console.log("height" +img.height)
   var ratio = 1;
   if(img.width > canvas_max_width){
     ratio = canvas_max_width / img.width; 
     img.width = canvas_max_width;
   }
   img.height = ratio * img.height;
-  console.log("width" +img.width)
-  console.log("height" +img.height)
   ratio=1;
   if(img.height > canvas_max_height){
     ratio = canvas_max_height / img.height; 
     img.height = canvas_max_height;
   }
   img.width = ratio * img.width;
-  console.log("width" +img.width)
-  console.log("height" +img.height)
   var imgInstance = new fabric.Image(img);
   canvas.setBackgroundImage(imgInstance);
   canvas.setHeight(imgInstance.height);
@@ -98,9 +86,7 @@ function canvasFill(img,canvas){
   var line = makeLine([ 150, 150, 250, 150 ]),
   line2 = makeLine([  175, 250, 225, 250 ]),
   line3 = makeLine([  150, 300, 250, 300 ]);
-
   canvas.add(line, line2, line3);
-
   canvas.add(
     makeCircle(5,line.get('x1'), line.get('y1'), null, line),
     makeCircle(5,line.get('x2'), line.get('y2'), line),
@@ -127,10 +113,8 @@ function makeCircle(r,left, top, line1, line2) {
       stroke: '#666'
     });
     c.hasControls = c.hasBorders = false;
-
     c.line1 = line1;
     c.line2 = line2;
-
     return c;
 }
 
@@ -152,6 +136,7 @@ function pad(num, size) {
 }
 var locations = Array();
 var fileName="";
+
 function detect(){
   var y = document.getElementById("pointer_div").fabric;
   //Width
@@ -212,24 +197,22 @@ function find(vec){
   return minIndex;
 }
 
- function loadJSON(callback) {   
+function loadJSON(callback) {
+	var xobj = new XMLHttpRequest();
+	xobj.overrideMimeType("application/json");
+	xobj.open('GET', 'data/'+fileName+'.json', false); // Replace 'my_data' with the path to your file
+	xobj.onreadystatechange = function () {
+	  if (xobj.readyState == 4 && xobj.status == "200") {
+	    // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+	    callback(xobj.responseText);
+	  }
+	};
+	xobj.send(null);  
+};
 
-    var xobj = new XMLHttpRequest();
-        xobj.overrideMimeType("application/json");
-    xobj.open('GET', 'data/'+fileName+'.json', false); // Replace 'my_data' with the path to your file
-    xobj.onreadystatechange = function () {
-          if (xobj.readyState == 4 && xobj.status == "200") {
-            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-            callback(xobj.responseText);
-          }
-    };
-    xobj.send(null);  
- };
-
-    //init user interface 
+//init user interface 
 function init(){
-
-      //Sort be Time:
+      //Sort by Time:
       locations.sort(function (a,b) {
         if (a.timestampMs < b.timestampMs)
         return -1;
@@ -237,7 +220,6 @@ function init(){
         return 1;
         return 0;
       });
-      
       //generate list:
       var year=-1;
       var month=-1;
@@ -271,7 +253,6 @@ function init(){
           stime=locations[i].timestampMs;
         }
       }
-      
       console.log(""+locations.length+" Location laoded");
       $("#faceDetect").css("display","none");
       $("#locationHistory").css("display","block");
@@ -279,10 +260,8 @@ function init(){
       mapinit();
       setTimeout(function(){ google.maps.event.trigger(map, "resize"); }, 1000);
 }
-
 //Load data
 var gmarkers = [];
-
 function removeMarkers(){
   for(i=0; i<gmarkers.length; i++){
     gmarkers[i].setMap(null);
@@ -304,7 +283,7 @@ function display(start,end){
       cordinats.push({lat: locations[i].latitudeE7*SCALAR_E7, lng: locations[i].longitudeE7*SCALAR_E7});
     }
   }
-var bounds = new google.maps.LatLngBounds();
+	var bounds = new google.maps.LatLngBounds();
   for(var j=0;j<cordinats.length;j++){
     var marker = new google.maps.Marker({
     position: new google.maps.LatLng(cordinats[j].lat, cordinats[j].lng),
@@ -352,6 +331,7 @@ var bounds = new google.maps.LatLngBounds();
       }
     });
 };
+
 function search(){
   //Rmove last search color
   $(".listelement").each(function (){
